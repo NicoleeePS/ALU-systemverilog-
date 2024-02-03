@@ -1,0 +1,94 @@
+`ifndef SCOREBOARD__SV
+`define SCOREBOARD__SV
+
+class alu_scoreboard extends uvm_component;
+
+    `uvm_component_utils(alu_scoreboard)
+
+    uvm_tlm_analysis_fifo #(ALU_FinalProject) m_alu_fifo_h;
+
+    function new(string name = "alu_scoreboard", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction: new
+
+    function void build_phase(uvm_phase phase);
+        m_alu_fifo_h = new("m_alu_fifo_h", this);
+    endfunction: build_phase
+
+    task run_phase(uvm_phase phase);
+
+        ALU_FinalProject alu_op;
+        logic [15:0] expALUOut;
+        logic expCout;
+
+        forever begin
+            m_alu_fifo_h.get(alu_op);
+            `uvm_info("SCOREBOARD:", $sformatf("DATA:: alu_op.A: %h, alu_op.B: %h, alu_op.OpCode: %b", alu_op.A, alu_op.B, alu_op.OpCode), UVM_NONE)
+
+            // Map ALU OpCode to corresponding operation
+            case (alu_op.OpCode)
+                3'b010: // ADD
+                begin
+                    expALUOut = alu_op.A + alu_op.B;
+                    expCout = (alu_op.A + alu_op.B) > 16'hFFFF;
+                end
+
+                3'b110: // SUB
+                begin
+                    expALUOut = alu_op.A - alu_op.B;
+                    expCout = alu_op.B > alu_op.A;
+                end
+
+                3'b000: // AND
+                begin
+                    expALUOut = alu_op.A & alu_op.B;
+                    expCout = 1'b0;
+                end
+
+                3'b001: // OR
+                begin
+                    expALUOut = alu_op.A | alu_op.B;
+                    expCout = 1'b0;
+                end
+
+                3'b011: // XOR
+                begin
+                    expALUOut = alu_op.A ^ alu_op.B;
+                    expCout = 1'b0;
+                end
+
+                3'b100: // NOR
+                begin
+                    expALUOut = ~(alu_op.A | alu_op.B);
+                    expCout = 1'b0;
+                end
+
+                3'b111: // SLT
+                begin
+                    if (alu_op.B > alu_op.A)
+                        expALUOut = 16'hFFFF;
+                    else
+                        expALUOut = 16'h0000;
+                    expCout = 1'b0;
+                end
+
+                default:
+                begin
+                    expALUOut = 16'h0000;
+                    expCout = 1'b0;
+                end
+            endcase
+
+            `uvm_info("SCOREBOARD:", $sformatf("DATA:: alu_op.ALU_Out: %h, expALUOut: %h, alu_op.Cout: %b, expCout: %b", alu_op.ALU_Out, expALUOut, alu_op.Cout, expCout), UVM_NONE)
+
+            if ((alu_op.ALU_Out == expALUOut) && (alu_op.Cout == expCout)) begin
+                `uvm_info("SCOREBOARD:", $sformatf("CHECK_OK"), UVM_NONE)
+            end else begin
+                `uvm_error("SCOREBOARD:", $sformatf("FAILED_TEST"))
+            end
+
+        end // forever
+    endtask: run_phase
+
+endclass: alu_scoreboard
+`endif
