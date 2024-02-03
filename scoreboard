@@ -81,8 +81,8 @@ class alu_scoreboard extends uvm_component;
 
             `uvm_info("SCOREBOARD:", $sformatf("DATA:: alu_op.ALU_Out: %h, expALUOut: %h, alu_op.Cout: %b, expCout: %b", alu_op.ALU_Out, expALUOut, alu_op.Cout, expCout), UVM_NONE)
 
-            if ((alu_op.ALU_Out == expALUOut) && (alu_op.Cout == expCout)) begin
-                `uvm_info("SCOREBOARD:", $sformatf("CHECK_OK"), UVM_NONE)
+            if ((alu_op.ALU_Out == expALUOut) && (alu_op.Cout == expCout)) begin //Compares the ALU's actual output and carry-out with the expected values. 
+                `uvm_info("SCOREBOARD:", $sformatf("CHECK_OK"), UVM_NONE) //If they match, an info message is printed; otherwise, an error message is printed
             end else begin
                 `uvm_error("SCOREBOARD:", $sformatf("FAILED_TEST"))
             end
