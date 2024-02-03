@@ -1,0 +1,74 @@
+module ALU_FinalProject (
+    input logic [15:0] A,
+    input logic [15:0] B,
+    input logic [2:0] OpCode,
+    input logic Mode,
+    output logic [15:0] ALU_Out,
+    output logic Cout
+);
+
+    logic [1:0] AU_Op_Sel;
+    logic SU_OP_type;
+    logic SU_Direction;
+    logic [2:0] LU_Opcode;
+    logic Sel1;
+    logic Sel2;
+    logic Sel_Cout;
+    logic AU_Cout;
+    logic [15:0] Shiftout;
+    logic [15:0] LogicOut;
+    logic [15:0] ArithOut;
+    logic [15:0] Z;
+
+    controller uController (
+        .mode(Mode),
+        .OpCode(OpCode),
+        .LU_OpCode(LU_Opcode),
+        .SU_Op_Type(SU_OP_type),
+        .SU_Direction(SU_Direction),
+        .AU_Op_Sel(AU_Op_Sel),
+        .Sel1(Sel1),
+        .Sel2(Sel2),
+        .Sel_Cout(Sel_Cout)
+    );
+
+    AU uArithmeticUnit (
+        .A(A),
+        .B(B),
+        .AU_Op_Sel(AU_Op_Sel),
+        .ArithOut(ArithOut),
+        .AU_Cout(AU_Cout)
+    );
+
+    shifter uShifterunit (
+        .A(A),
+        .B(B),
+        .SU_Direction(SU_Direction),
+        .SU_op_type(SU_OP_type),
+        .Shiftout(Shiftout)
+    );
+
+    LU uLogicUnit (
+        .A(A),
+        .B(B),
+        .LU_OpCode(LU_Opcode),
+        .LogicOut(LogicOut)
+    );
+
+    MUX1 uMUX01 (
+        .ArithOut(ArithOut),
+        .Shiftout(Shiftout),
+        .Sel1(Sel2),
+        .Z(Z)
+    );
+
+    MUX2 uMUX02 (
+        .z(Z),
+        .LogicOut(LogicOut),
+        .Sel2(Sel1),
+        .ALU_OUT(ALU_Out)
+    );
+
+    assign Cout = AU_Cout & Sel_Cout;
+
+endmodule
