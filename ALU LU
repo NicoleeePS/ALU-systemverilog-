@@ -1,0 +1,21 @@
+module LU (
+    input logic [15:0] A,
+    input logic [15:0] B,
+    input logic [2:0] LU_OpCode,
+    output logic [15:0] LogicOut
+);
+
+    always_comb begin
+        case (LU_OpCode)
+            3'b000: LogicOut = ~(A | B);
+            3'b001: LogicOut = ~(A & B);
+            3'b010: LogicOut = A | B;
+            3'b011: LogicOut = A & B;
+            3'b100: LogicOut = A ^ B;
+            3'b101: LogicOut = ~(A ^ B);
+            3'b110: LogicOut = ~A;
+            default: LogicOut = 16'hxxxx;
+        endcase
+    end
+
+endmodule
