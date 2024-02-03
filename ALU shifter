@@ -1,0 +1,22 @@
+module shifter (
+    input logic [15:0] A,
+    input logic [15:0] B,
+    input logic SU_Direction,
+    input logic SU_op_type,
+    output logic [15:0] Shiftout
+);
+
+    logic [1:0] mode;
+
+    always_comb begin
+        mode = {SU_Direction, SU_op_type};
+        case (mode)
+            2'b00: Shiftout = A << B;
+            2'b01: Shiftout = A >> B;
+            2'b10: Shiftout = A << B;
+            2'b11: Shiftout = A >> B;
+            default: Shiftout = 16'hxxxx;
+        endcase
+    end
+
+endmodule
