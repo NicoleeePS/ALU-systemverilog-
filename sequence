@@ -1,0 +1,29 @@
+`ifndef ALU_BASE_SEQ__SV
+`define ALU_BASE_SEQ__SV
+
+class alu_sequence extends uvm_sequence#(ALU_FinalProject);
+    `uvm_object_utils(alu_sequence)
+
+    // Each sequence has a random number of operations.
+    // There is a constraint to keep the number reasonable.
+    rand int unsigned num_of_ops;
+    constraint num_of_ops_con {num_of_ops inside {[16:24]};}
+
+    function new(string name = "alu_sequence");
+        super.new(name);
+    endfunction: new
+
+    // This task generates a sequence of transactions.
+    task body();
+        ALU_FinalProject alu_op;
+        repeat (num_of_ops) begin
+            alu_op = ALU_FinalProject::type_id::create(.name("alu_op"));
+            start_item(alu_op);
+            if (!alu_op.randomize()) begin
+                `uvm_error("alu_op", "Randomize failed.");
+            end
+            finish_item(alu_op);
+        end
+    endtask: body
+endclass: alu_sequence
+`endif
