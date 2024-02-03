@@ -1,0 +1,23 @@
+module controller (
+    input logic mode,
+    input logic [2:0] OpCode,
+    output logic [2:0] LU_OpCode,
+    output logic SU_Op_Type,
+    output logic SU_Direction,
+    output logic [1:0] AU_Op_Sel,
+    output logic Sel1,
+    output logic Sel2,
+    output logic Sel_Cout
+);
+
+    always_comb begin
+        SU_Op_Type = OpCode[1];
+        SU_Direction = OpCode[0];
+        LU_OpCode = OpCode;
+        AU_Op_Sel = OpCode[1 downto 0];
+        Sel1 = mode;
+        Sel2 = OpCode[2];
+        Sel_Cout = 1'b1;
+    end
+
+endmodule
